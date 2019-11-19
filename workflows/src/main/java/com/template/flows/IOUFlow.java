@@ -1,7 +1,7 @@
 package com.template.flows;
 
 import co.paralleluniverse.fibers.Suspendable;
-import com.template.contracts.TemplateContract;
+import com.template.contracts.IOUContract;
 import com.template.states.IOUState;
 import net.corda.core.contracts.Command;
 import net.corda.core.flows.FinalityFlow;
@@ -50,11 +50,11 @@ public class IOUFlow extends FlowLogic<Void> {
 
         // We create the transaction components.
         IOUState outputState = new IOUState(iouValue, getOurIdentity(), otherParty);
-        Command command = new Command<>(new TemplateContract.Commands.Action(), getOurIdentity().getOwningKey());
+        Command command = new Command<>(new IOUContract.Commands.Action(), getOurIdentity().getOwningKey());
 
         // We create a transaction builder and add the components.
         TransactionBuilder txBuilder = new TransactionBuilder(notary)
-            .addOutputState(outputState, TemplateContract.ID)
+            .addOutputState(outputState, IOUContract.ID)
             .addCommand(command);
 
         // Signing the transaction.
