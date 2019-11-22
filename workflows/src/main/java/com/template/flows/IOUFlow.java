@@ -55,7 +55,7 @@ public class IOUFlow extends FlowLogic<Void> {
         // We create the transaction components.
         IOUState outputState = new IOUState(getOurIdentity(), otherParty, iouValue);
         List<PublicKey> requiredSigners = Arrays.asList(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
-        Command command = new Command<>(new IOUContract.Create(), requiredSigners);
+        Command command = new Command<>(new IOUContract.Commands.Action(), requiredSigners);
 
         // We create a transaction builder and add the components.
         TransactionBuilder txBuilder = new TransactionBuilder(notary)

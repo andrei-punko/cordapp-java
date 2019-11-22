@@ -19,15 +19,11 @@ public class IOUContract implements Contract {
     // This is used to identify our contract when building a transaction.
     public static final String ID = "com.template.contracts.IOUContract";
 
-    // Our Create command.
-    public static class Create implements CommandData {
-    }
-
     // A transaction is valid if the verify() function of the contract of all the transaction's input and output states
     // does not throw an exception.
     @Override
     public void verify(LedgerTransaction tx) {
-        final CommandWithParties<Create> command = requireSingleCommand(tx.getCommands(), IOUContract.Create.class);
+        final CommandWithParties<Commands.Action> command = requireSingleCommand(tx.getCommands(), IOUContract.Commands.Action.class);
 
         // Constraints on the shape of the transaction.
         if (!tx.getInputs().isEmpty())
