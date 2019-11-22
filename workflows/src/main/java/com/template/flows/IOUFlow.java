@@ -24,7 +24,7 @@ import net.corda.core.utilities.ProgressTracker;
 // ******************
 @InitiatingFlow
 @StartableByRPC
-public class IOUFlow extends FlowLogic<Void> {
+public class IOUFlow extends FlowLogic<SignedTransaction> {
     private final Integer iouValue;
     private final Party otherParty;
 
@@ -33,7 +33,7 @@ public class IOUFlow extends FlowLogic<Void> {
      */
     private final ProgressTracker progressTracker = new ProgressTracker();
 
-    public IOUFlow(Integer iouValue, Party otherParty) {
+    public IOUFlow(Party otherParty, Integer iouValue) {
         this.iouValue = iouValue;
         this.otherParty = otherParty;
     }
@@ -48,7 +48,7 @@ public class IOUFlow extends FlowLogic<Void> {
      */
     @Suspendable
     @Override
-    public Void call() throws FlowException {
+    public SignedTransaction call() throws FlowException {
         // We retrieve the notary identity from the network map.
         Party notary = getServiceHub().getNetworkMapCache().getNotaryIdentities().get(0);
 
@@ -77,8 +77,6 @@ public class IOUFlow extends FlowLogic<Void> {
         );
 
         // Finalising the transaction.
-        subFlow(new FinalityFlow(fullySignedTx, otherPartySession));
-
-        return null;
+        return subFlow(new FinalityFlow(fullySignedTx, otherPartySession));
     }
 }
