@@ -53,7 +53,7 @@ public class IOUFlow extends FlowLogic<Void> {
         Party notary = getServiceHub().getNetworkMapCache().getNotaryIdentities().get(0);
 
         // We create the transaction components.
-        IOUState outputState = new IOUState(iouValue, getOurIdentity(), otherParty);
+        IOUState outputState = new IOUState(getOurIdentity(), otherParty, iouValue);
         List<PublicKey> requiredSigners = Arrays.asList(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
         Command command = new Command<>(new IOUContract.Create(), requiredSigners);
 
