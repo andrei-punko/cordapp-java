@@ -149,13 +149,24 @@ with the username `user1` and the password `test`, and serves the webserver on p
 
 #### Interacting with the webserver
 
-The static webpage is served on:
+To start webserver use `runPartyAServer` or `runPartyBServer` tasks
 
-    http://localhost:10050
+List of available actions taken from [here](https://docs.corda.net/tutorial-cordapp.html):
 
-While the sole template endpoint is served on:
+- Returns the node's name:  
+`http://localhost:10050/api/example/me`
 
-    http://localhost:10050/templateendpoint
+- Returns all parties registered with the network map service:  
+`http://localhost:10050/api/example/peers`
+
+- Displays all IOU states that exist in the node's vault:  
+`http://localhost:10050/api/example/ious`
+
+- To create an IOU between PartyA and PartyB, run the following command from the command line:  
+`curl -i -X POST 'http://localhost:10050/api/example/create-iou?iouValue=8&partyName=O=PartyB,+L=New+York,+C=US' -H 'Content-Type: application/x-www-form-urlencoded'`
+
+- Check IOU states again to see added transaction:  
+`http://localhost:10050/api/example/ious`
     
 # Extending the template
 
