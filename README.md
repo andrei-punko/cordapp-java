@@ -1,14 +1,11 @@
-<p align="center">
-  <img src="https://www.corda.net/wp-content/uploads/2016/11/fg005_corda_b.png" alt="Corda" width="500">
-</p>
 
 # CorDapp Template - Java
 
 Welcome to the Java CorDapp template. The CorDapp template is a stubbed-out CorDapp that you can use to bootstrap 
 your own CorDapps.
 
-**This is the Java version of the CorDapp template. The Kotlin equivalent is 
-[here](https://github.com/corda/cordapp-template-kotlin/).**
+**This is the Java version of the CorDapp template taken from [here](https://github.com/corda/cordapp-template-java). 
+The Kotlin equivalent is [here](https://github.com/corda/cordapp-template-kotlin/).**
 
 # Pre-Requisites
 
@@ -34,9 +31,33 @@ If you would prefer to use the built in IntelliJ JUnit test runner, you can run 
 copy your quasar JAR file to the lib directory. You will then need to specify ``-javaagent:lib/quasar.jar``
 and set the run directory to the project root directory for each test.
 
-## Running the nodes
+## Deploying our CorDapp and running the nodes
 
-See https://docs.corda.net/tutorial-cordapp.html#running-the-example-cordapp.
+See https://docs.corda.net/tutorial-cordapp.html#running-the-example-cordapp for details.
+
+In short: we can run this `deployNodes` task using Gradle. For each node definition, Gradle will:
+
+- Package the project’s source files into a CorDapp jar
+- Create a new node in `build/nodes` with our CorDapp already installed
+
+We can do that now by running the following commands from the root of the project:
+
+`./gradlew clean deployNodes`
+
+Running `deployNodes` will build the nodes under `build/nodes`. If we navigate to one of these folders, 
+we’ll see the three node folders. Each node folder has the following structure:
+<pre>
+    .
+    |____corda.jar                     // The runnable node
+    |____corda-webserver.jar           // The node's webserver (The notary doesn't need a web server)
+    |____node.conf                     // The node's configuration file
+    |____cordapps
+    |____java/kotlin-source-0.1.jar    // Our IOU CorDapp
+</pre>
+Let’s start the nodes by running the following commands from the root of the project:  
+<pre>
+build/nodes/runnodes
+</pre>
 
 ## Interacting with the nodes
 
@@ -75,6 +96,12 @@ the other nodes on the network:
     ]
     
     Tue Nov 06 12:30:11 GMT 2018>>> 
+
+`start IOUFlow iouValue: 99, otherParty: "O=PartyB,L=New York,C=US"`
+
+Inspect status of transaction
+ 
+`run vaultQuery contractStateType: com.template.states.IOUState`
 
 You can find out more about the node shell [here](https://docs.corda.net/shell.html).
 
