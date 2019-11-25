@@ -24,7 +24,7 @@ lib/dokka.jar
 *.iml
 
 ## Directory-based project format:
-.idea
+#.idea
 
 # if you remove the above rule, at least ignore the following:
 
@@ -32,6 +32,8 @@ lib/dokka.jar
 .idea/*.xml
 .idea/copyright
 .idea/jsLibraryMappings.xml
+.idea/$PRODUCT_WORKSPACE_FILE$
+.idea/codeStyles
 
 # User-specific stuff:
 .idea/tasks.xml
