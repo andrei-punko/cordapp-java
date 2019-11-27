@@ -1,35 +1,14 @@
 
-# CorDapp Template - Java
+# "I owe you" (IoU) blockchain app example using Corda platform 
 
-Welcome to the Java CorDapp template. The CorDapp template is a stubbed-out CorDapp that you can use to bootstrap 
-your own CorDapps.
+**Based on Java version of the CorDapp template taken from [here](https://github.com/corda/cordapp-template-java). 
+The Kotlin template situated [here](https://github.com/corda/cordapp-template-kotlin/).**
 
-**This is the Java version of the CorDapp template taken from [here](https://github.com/corda/cordapp-template-java). 
-The Kotlin equivalent is [here](https://github.com/corda/cordapp-template-kotlin/).**
+###### CorDapp (Corda Distributed Application) - distributed applications that run on the Corda platform
 
-# Pre-Requisites
+## Pre-Requisites
 
 See https://docs.corda.net/getting-set-up.html.
-
-# Usage
-
-## Running tests inside IntelliJ
-	
-We recommend editing your IntelliJ preferences so that you use the Gradle runner - this means that the quasar utils
-plugin will make sure that some flags (like ``-javaagent`` - see below) are
-set for you.
-
-To switch to using the Gradle runner:
-
-* Navigate to ``Build, Execution, Deployment -> Build Tools -> Gradle -> Runner`` (or search for `runner`)
-  * Windows: this is in "Settings"
-  * MacOS: this is in "Preferences"
-* Set "Delegate IDE build/run actions to gradle" to true
-* Set "Run test using:" to "Gradle Test Runner"
-
-If you would prefer to use the built in IntelliJ JUnit test runner, you can run ``gradlew installQuasar`` which will
-copy your quasar JAR file to the lib directory. You will then need to specify ``-javaagent:lib/quasar.jar``
-and set the run directory to the project root directory for each test.
 
 ## Deploying our CorDapp and running the nodes
 
@@ -37,27 +16,24 @@ See https://docs.corda.net/tutorial-cordapp.html#running-the-example-cordapp for
 
 In short: we can run this `deployNodes` task using Gradle. For each node definition, Gradle will:
 
-- Package the project’s source files into a CorDapp jar
+- Package the project’s source files into a CorDapp jars
 - Create a new node in `build/nodes` with our CorDapp already installed
 
 We can do that now by running the following commands from the root of the project:
 
-`./gradlew clean deployNodes`
+    ./gradlew clean deployNodes
 
 Running `deployNodes` will build the nodes under `build/nodes`. If we navigate to one of these folders, 
 we’ll see the three node folders. Each node folder has the following structure:
-<pre>
+
     .
     |____corda.jar                     // The runnable node
-    |____corda-webserver.jar           // The node's webserver (The notary doesn't need a web server)
     |____node.conf                     // The node's configuration file
-    |____cordapps
-    |____java/kotlin-source-0.1.jar    // Our IOU CorDapp
-</pre>
+    |____cordapps                      // Our IOU CorDapp
+
 Let’s start the nodes by running the following commands from the root of the project:  
-<pre>
-build/nodes/runnodes
-</pre>
+
+    build/nodes/runnodes
 
 ## Interacting with the nodes
 
@@ -97,11 +73,19 @@ the other nodes on the network:
     
     Tue Nov 06 12:30:11 GMT 2018>>> 
 
-`start IOUFlow iouValue: 99, otherParty: "O=PartyB,L=New York,C=US"`
+Check available flows by command:
+
+    flow list
+
+Run next command from NodeA to start new flow:
+
+    start IOUFlow iouValue: 99, otherParty: "O=PartyB,L=New York,C=US"
 
 Inspect status of transaction
  
-`run vaultQuery contractStateType: com.template.states.IOUState`
+    run vaultQuery contractStateType: com.template.states.IOUState
+
+Only NodeA & NodeB know about this transation. You could check it by running same command on notary node
 
 You can find out more about the node shell [here](https://docs.corda.net/shell.html).
 
@@ -168,9 +152,9 @@ List of available actions taken from [here](https://docs.corda.net/tutorial-cord
 - Check IOU states again to see added transaction:  
 `http://localhost:10050/api/example/ious`
     
-# Extending the template
+## Extending the application
 
-You should extend this template as follows:
+You could extend this application as follows:
 
 * Add your own state and contract definitions under `contracts/src/main/java/`
 * Add your own flow definitions under `workflows/src/main/java/`
