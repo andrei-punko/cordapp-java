@@ -14,9 +14,9 @@ import org.junit.Test;
 
 public class IOUContractTest {
 
-    private final TestIdentity alice = new TestIdentity(new CordaX500Name("Alice", "", "GB"));
-    private final TestIdentity bob = new TestIdentity(new CordaX500Name("Bob", "", "GB"));
-    private MockServices ledgerServices = new MockServices(new TestIdentity(new CordaX500Name("TestId", "", "GB")));
+    private final TestIdentity alice = new TestIdentity(new CordaX500Name("Alice", "London", "GB"));
+    private final TestIdentity bob = new TestIdentity(new CordaX500Name("Bob", "Glasgow", "GB"));
+    private MockServices ledgerServices = new MockServices(new TestIdentity(new CordaX500Name("TestId", "New York", "US")));
 
     private IOUState iouState = new IOUState(alice.getParty(), bob.getParty(), 1);
 

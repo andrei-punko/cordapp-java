@@ -1,4 +1,4 @@
-package com.template;
+package com.template.flows;
 
 import static junit.framework.TestCase.assertNull;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -9,9 +9,7 @@ import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.template.contracts.IOUContract;
-import com.template.flows.IOUFlow;
 import com.template.states.IOUState;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import net.corda.core.concurrent.CordaFuture;
 import net.corda.core.contracts.Command;
