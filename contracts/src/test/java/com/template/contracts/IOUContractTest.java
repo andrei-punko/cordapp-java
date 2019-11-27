@@ -32,7 +32,7 @@ public class IOUContractTest {
             tx.input(IOUContract.ID, iouState);
             tx.output(IOUContract.ID, iouState);
             tx.command(Arrays.asList(alice.getPublicKey(), bob.getPublicKey()), new IOUContract.Commands.Action());
-            tx.fails();
+            tx.failsWith("No inputs should be consumed when issuing an IOU.");
             return null;
         });
 
@@ -52,7 +52,7 @@ public class IOUContractTest {
             tx.output(IOUContract.ID, iouState);
             tx.output(IOUContract.ID, iouState);
             tx.command(Arrays.asList(alice.getPublicKey(), bob.getPublicKey()), new IOUContract.Commands.Action());
-            tx.fails();
+            tx.failsWith("There should be one output state of type IOUState.");
             return null;
         });
 
@@ -114,7 +114,7 @@ public class IOUContractTest {
             // Has zero-amount IouState, will fail.
             tx.output(IOUContract.ID, zeroIouState);
             tx.command(Arrays.asList(alice.getPublicKey(), bob.getPublicKey()), new IOUContract.Commands.Action());
-            tx.fails();
+            tx.failsWith("The IOU's value must be non-negative.");
             return null;
         });
 
@@ -122,7 +122,7 @@ public class IOUContractTest {
             // Has negative-amount IouState, will fail.
             tx.output(IOUContract.ID, negativeIouState);
             tx.command(Arrays.asList(alice.getPublicKey(), bob.getPublicKey()), new IOUContract.Commands.Action());
-            tx.fails();
+            tx.failsWith("The IOU's value must be non-negative.");
             return null;
         });
 
@@ -167,10 +167,18 @@ public class IOUContractTest {
         IOUState iouStateWhereBobIsIssuer = new IOUState(bob.getParty(), alice.getParty(), 1);
 
         transaction(ledgerServices, tx -> {
+            // Lender and borrower are the same, will fail.
+            tx.output(IOUContract.ID, new IOUState(alice.getParty(), alice.getParty(), 1));
+            tx.command(alice.getPublicKey(), new IOUContract.Commands.Action());
+            tx.failsWith("The lender and the borrower cannot be the same entity.");
+            return null;
+        });
+
+        transaction(ledgerServices, tx -> {
             // Issuer is not a required signer, will fail.
             tx.output(IOUContract.ID, iouState);
             tx.command(bob.getPublicKey(), new IOUContract.Commands.Action());
-            tx.fails();
+            tx.failsWith("There must be two signers.");
             return null;
         });
 
@@ -178,7 +186,15 @@ public class IOUContractTest {
             // Issuer is also not a required signer, will fail.
             tx.output(IOUContract.ID, iouStateWhereBobIsIssuer);
             tx.command(alice.getPublicKey(), new IOUContract.Commands.Action());
-            tx.fails();
+            tx.failsWith("There must be two signers.");
+            return null;
+        });
+
+        transaction(ledgerServices, tx -> {
+            // Two same signers, Bob not presents, will fail.
+            tx.output(IOUContract.ID, iouState);
+            tx.command(Arrays.asList(alice.getPublicKey(), alice.getPublicKey()), new IOUContract.Commands.Action());
+            tx.failsWith("The borrower and lender must be signers.");
             return null;
         });
 
