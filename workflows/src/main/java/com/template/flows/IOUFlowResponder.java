@@ -13,12 +13,13 @@ import net.corda.core.flows.InitiatedBy;
 import net.corda.core.flows.ReceiveFinalityFlow;
 import net.corda.core.flows.SignTransactionFlow;
 import net.corda.core.transactions.SignedTransaction;
+import net.corda.core.utilities.ProgressTracker;
 
 // ******************
 // * Responder flow *
 // ******************
 @InitiatedBy(IOUFlow.class)
-public class IOUFlowResponder extends FlowLogic<Void> {
+public class IOUFlowResponder extends FlowLogic<SignedTransaction> {
     private final FlowSession otherPartySession;
 
     public IOUFlowResponder(FlowSession otherPartySession) {
@@ -27,11 +28,11 @@ public class IOUFlowResponder extends FlowLogic<Void> {
 
     @Suspendable
     @Override
-    public Void call() throws FlowException {
+    public SignedTransaction call() throws FlowException {
 
         class SignTxFlow extends SignTransactionFlow {
-            private SignTxFlow(FlowSession otherPartySession) {
-                super(otherPartySession);
+            private SignTxFlow(FlowSession otherPartySession, ProgressTracker progressTracker) {
+                super(otherPartySession, progressTracker);
             }
 
             @Override
@@ -46,9 +47,8 @@ public class IOUFlowResponder extends FlowLogic<Void> {
             }
         }
 
-        SecureHash expectedTxId = subFlow(new SignTxFlow(otherPartySession)).getId();
-        subFlow(new ReceiveFinalityFlow(otherPartySession, expectedTxId));
-
-        return null;
+        SignTxFlow signTxFlow = new SignTxFlow(otherPartySession, SignTransactionFlow.Companion.tracker());
+        SecureHash expectedTxId = subFlow(signTxFlow).getId();
+        return subFlow(new ReceiveFinalityFlow(otherPartySession, expectedTxId));
     }
 }
