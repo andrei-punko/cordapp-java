@@ -3,6 +3,7 @@ package com.template.flows;
 import static net.corda.core.contracts.ContractsDSL.requireThat;
 
 import co.paralleluniverse.fibers.Suspendable;
+import com.google.common.collect.ImmutableSet;
 import com.template.contracts.IOUContract;
 import com.template.states.IOUState;
 import java.security.PublicKey;
@@ -104,7 +105,7 @@ public class IOUFlow {
             // Stage 3.
             progressTracker.setCurrentStep(SIGNING_TRANSACTION);
             // Signing the transaction.
-            SignedTransaction signedTx = getServiceHub().signInitialTransaction(txBuilder);
+            SignedTransaction partSignedTx = getServiceHub().signInitialTransaction(txBuilder);
 
             // Stage 4.
             progressTracker.setCurrentStep(GATHERING_SIGS);
@@ -112,16 +113,19 @@ public class IOUFlow {
             FlowSession otherPartySession = initiateFlow(otherParty);
             // Obtaining the counterparty's signature.
             SignedTransaction fullySignedTx = subFlow(
-                new CollectSignaturesFlow(signedTx, Arrays.asList(otherPartySession), CollectSignaturesFlow.tracker())
+                new CollectSignaturesFlow(partSignedTx, ImmutableSet.of(otherPartySession), CollectSignaturesFlow.Companion.tracker())
             );
 
             // Stage 5.
             progressTracker.setCurrentStep(FINALISING_TRANSACTION);
             // Finalising the transaction.
-            return subFlow(new FinalityFlow(fullySignedTx, otherPartySession));
+            return subFlow(new FinalityFlow(fullySignedTx, ImmutableSet.of(otherPartySession)));
         }
     }
 
+    // ******************
+    // * Responder flow *
+    // ******************
     @InitiatedBy(Initiator.class)
     public static class Responder extends FlowLogic<SignedTransaction> {
         private final FlowSession otherPartySession;
