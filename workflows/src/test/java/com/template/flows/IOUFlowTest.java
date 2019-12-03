@@ -61,7 +61,7 @@ public class IOUFlowTest {
 
     @Test
     public void testTransaction() throws Exception {
-        IOUFlow flow = new IOUFlow(bParty, 99);
+        IOUFlow.Initiator flow = new IOUFlow.Initiator(bParty, 99);
         CordaFuture<SignedTransaction> future = nodeA.startFlow(flow);
         mockNetwork.runNetwork();
         SignedTransaction signedTransaction = future.get();

@@ -102,7 +102,7 @@ public class Controller {
         }
 
         try {
-            SignedTransaction signedTx = proxy.startTrackedFlowDynamic(IOUFlow.class, otherParty, iouValue)
+            SignedTransaction signedTx = proxy.startTrackedFlowDynamic(IOUFlow.Initiator.class, otherParty, iouValue)
                 .getReturnValue().get();
             return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Transaction id ${signedTx.id} committed to ledger.\n");
