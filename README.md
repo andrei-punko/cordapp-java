@@ -70,22 +70,34 @@ the other nodes on the network:
       "serial" : 1541505384742
     }
     ]
-    
-    Tue Nov 06 12:30:11 GMT 2018>>> 
 
-Check available flows by command:
+Check available flows by `flow list` command:
 
-    flow list
+    Wed Dec 04 17:47:34 MSK 2019>>> flow list
+    com.template.flows.IOUFlow$Initiator
+    net.corda.core.flows.ContractUpgradeFlow$Authorise
+    net.corda.core.flows.ContractUpgradeFlow$Deauthorise
+    net.corda.core.flows.ContractUpgradeFlow$Initiate
 
-Run next command from NodeA to start new flow:
+Check node info by `run nodeInfo` command:
 
-    start IOUFlow iouValue: 99, otherParty: "O=PartyB,L=New York,C=US"
+    Wed Dec 04 17:47:17 MSK 2019>>> run nodeInfo
+    addresses:
+    - "partyb:10008"
+    legalIdentitiesAndCerts:
+    - "O=PartyB, L=New York, C=US"
+    platformVersion: 5
+    serial: 1575470125333
 
-Inspect status of transaction
+Start new flow from `NodeA` by `start` command:
+
+    start IOUFlow$Initiator iouValue: 99, otherParty: "O=PartyB,L=New York,C=US"
+
+Inspect status of transaction by `run vaultQuery` command:
  
     run vaultQuery contractStateType: com.template.states.IOUState
 
-Only NodeA & NodeB know about this transation. You could check it by running same command on notary node
+Only `NodeA` & `NodeB` know about this transation. You could check it by running same command on notary node
 
 You can find out more about the node shell [here](https://docs.corda.net/shell.html).
 
@@ -162,3 +174,35 @@ You could extend this application as follows:
 
 For a guided example of how to extend this template, see the Hello, World! tutorial 
 [here](https://docs.corda.net/hello-world-introduction.html).
+
+## Put node into Docker container
+
+Firstly we need to generate nodes files with appropriate configuration under `build/nodes` by `deployNodesForDocker` task: 
+
+    ./gradlew clean deployNodesForDocker
+
+And start Docker containers by command:
+
+    docker-compose up
+
+After we could connect to Corda shell of node inside Docker container by `ssh` command using password `test`:
+
+    ssh -p 10024 user1@localhost
+
+Or if needed - could connect to container by SSH using `docker exec` command:
+
+    docker exec -it cordapp-iou-java_partya_1 sh
+
+To get container name use `docker ps` command before that
+
+Note: In case of experiments with multiple logins and Docker images recreation warning about "man in the middle attack" could appear.
+To dismiss it you could delete `~.ssh/known_hosts` file
+
+## Connection to node H2 DB
+
+To inspect content of node H2 DB you could use any DB client, for example [this](https://www.h2database.com/html/download.html) from H2 site.
+For connection you need to use url like `jdbc:h2:<absolute path to 'persistence' folder of node>`, for example: 
+
+    jdbc:h2:c:\Work\Personal\cordapp-iou-java\build\nodes\PartyA\persistence
+
+and `sa` user with empty password
