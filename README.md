@@ -206,3 +206,36 @@ For connection you need to use url like `jdbc:h2:<absolute path to 'persistence'
     jdbc:h2:c:\Work\Personal\cordapp-iou-java\build\nodes\PartyA\persistence
 
 and `sa` user with empty password
+
+## Use PostgreSQL DB inside Docker container instead of H2 DB
+
+Add next block into `node.conf`:
+
+    dataSourceProperties {
+        dataSourceClassName="org.postgresql.ds.PGSimpleDataSource"
+        dataSource.url="jdbc:postgresql://localhost:5433/partya"
+        dataSource.user="node-user"
+        dataSource.password="node-password"
+    }
+    database {
+        transactionIsolationLevel="READ_COMMITTED"
+    }
+
+Start Docker cotainer with PostgreSQL by run `docker-compose up` command
+from folder with next `docker-compose.yml` script:
+
+    version: '3'
+    services:
+      postgres_partya:
+        image: postgres:9.6.15-alpine
+        volumes:
+          - postgres-partya-volume:/var/lib/postgresql/data
+        ports:
+          - 5433:5432
+        environment:
+          - POSTGRES_DB=partya
+          - POSTGRES_USER=node-user
+          - POSTGRES_PASSWORD=node-password
+        restart: unless-stopped
+    volumes:
+      postgres-partya-volume:
