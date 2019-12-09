@@ -239,3 +239,13 @@ from folder with next `docker-compose.yml` script:
         restart: unless-stopped
     volumes:
       postgres-partya-volume:
+
+## Connecting to DB of running node
+
+To make H2 DB of running node accessible - node should be started with following block added into `node.conf`:
+
+    h2Settings {
+        address: "localhost:12345"
+    }
+
+After that - connect to `jdbc:h2:tcp://localhost:12345/node` using any database browsing tool that supports JDBC.
