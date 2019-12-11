@@ -7,11 +7,9 @@ The Kotlin template situated [here](https://github.com/corda/cordapp-template-ko
 ###### CorDapp (Corda Distributed Application) - distributed applications that run on the Corda platform
 
 ## Pre-Requisites
-
 See https://docs.corda.net/getting-set-up.html.
 
 ## Deploying our CorDapp and running the nodes
-
 See https://docs.corda.net/tutorial-cordapp.html#running-the-example-cordapp for details.
 
 In short: we can run this `deployNodes` task using Gradle. For each node definition, Gradle will:
@@ -38,7 +36,6 @@ Let’s start the nodes by running the following commands from the root of the p
 ## Interacting with the nodes
 
 ### Shell
-
 When started via the command line, each node will display an interactive shell:
 
     Welcome to the Corda interactive shell.
@@ -109,12 +106,10 @@ and prints a list of the other nodes on the network.
 #### Running the client
 
 ##### Via the command line
-
 Run the `runTemplateClient` Gradle task. By default, it connects to the node with RPC address `localhost:10006` with 
 the username `user1` and the password `test`.
 
 ##### Via IntelliJ
-
 Run the `Run Template Client` run configuration. By default, it connects to the node with RPC address `localhost:10006` 
 with the username `user1` and the password `test`.
 
@@ -134,17 +129,14 @@ And a static webpage is defined here:
 #### Running the webserver
 
 ##### Via the command line
-
 Run the `runTemplateServer` Gradle task. By default, it connects to the node with RPC address `localhost:10006` with 
 the username `user1` and the password `test`, and serves the webserver on port `localhost:10050`.
 
 ##### Via IntelliJ
-
 Run the `Run Template Server` run configuration. By default, it connects to the node with RPC address `localhost:10006` 
 with the username `user1` and the password `test`, and serves the webserver on port `localhost:10050`.
 
 #### Interacting with the webserver
-
 To start webserver use `runPartyAServer` or `runPartyBServer` tasks
 
 List of available actions taken from [here](https://docs.corda.net/tutorial-cordapp.html):
@@ -165,7 +157,6 @@ List of available actions taken from [here](https://docs.corda.net/tutorial-cord
 `http://localhost:10050/api/example/ious`
     
 ## Extending the application
-
 You could extend this application as follows:
 
 * Add your own state and contract definitions under `contracts/src/main/java/`
@@ -176,7 +167,6 @@ For a guided example of how to extend this template, see the Hello, World! tutor
 [here](https://docs.corda.net/hello-world-introduction.html).
 
 ## Put node into Docker container
-
 Firstly we need to generate nodes files with appropriate configuration under `build/nodes` by `deployNodesForDocker` task: 
 
     ./gradlew clean deployNodesForDocker
@@ -199,7 +189,6 @@ Note: In case of experiments with multiple logins and Docker images recreation w
 To dismiss it you could delete `~.ssh/known_hosts` file
 
 ## Connection to node H2 DB
-
 To inspect content of node H2 DB you could use any DB client, for example [this](https://www.h2database.com/html/download.html) from H2 site.
 For connection you need to use url like `jdbc:h2:<absolute path to 'persistence' folder of node>`, for example: 
 
@@ -208,7 +197,6 @@ For connection you need to use url like `jdbc:h2:<absolute path to 'persistence'
 and `sa` user with empty password
 
 ## Use PostgreSQL DB inside Docker container instead of H2 DB
-
 Add next block into `node.conf`:
 
     dataSourceProperties {
@@ -241,7 +229,6 @@ from folder with next `docker-compose.yml` script:
       postgres-partya-volume:
 
 ## Connecting to DB of running node
-
 To make H2 DB of running node accessible - node should be started with following block added into `node.conf`:
 
     h2Settings {
@@ -249,3 +236,69 @@ To make H2 DB of running node accessible - node should be started with following
     }
 
 After that - connect to `jdbc:h2:tcp://localhost:12345/node` using any database browsing tool that supports JDBC.
+
+## Setup custom network map service
+According to [this](https://gitlab.com/cordite/network-map-service/blob/master/FAQ.md) FAQ
+
+#### 1.1 Start the NMS using Docker
+
+    docker run -p 8080:8080 -e NMS_STORAGE_TYPE=file cordite/network-map
+
+#### 1.2. Prepare the Cordapp project
+
+    ./gradlew clean deployNodes
+
+Add the `compatibilityZoneURL` and `devModeOptions.allowCompatibilityZone` to the node.config within each node directory and ensure that all state is removed from the node directories
+
+    pushd build/nodes
+    for N in */; do
+        echo 'compatibilityZoneURL="http://localhost:8080"' >> $N/node.conf
+        echo 'devModeOptions.allowCompatibilityZone=true' >> $N/node.conf
+        pushd $N
+        rm -rf network-parameters nodeInfo-* persistence.mv.db certificates additional-node-infos
+        popd
+    done
+    popd
+
+#### 1.3. Register the nodes
+Download the network truststore
+
+    curl http://localhost:8080/network-map/truststore -o ~/tmp/network-truststore.jks
+
+For each node run initial registration
+
+    pushd build/nodes
+    for N in */; do
+          pushd $N
+          java -jar corda.jar --initial-registration --network-root-truststore ~/tmp/network-truststore.jks --network-root-truststore-password trustpass
+          popd
+    done
+    popd
+
+#### 1.4. Start the notary node
+Navigate to notary node directory and excecute
+
+    java -jar corda.jar
+
+Check that the notary node has been registered with the NMS [http://localhost:8080](http://localhost:8080)
+
+#### 1.5 Designate the notary
+Login to the NMS API and cache the token:
+
+    TOKEN=`curl -X POST "http://localhost:8080//admin/api/login" -H  "accept: text/plain" -H  "Content-Type: application/json" -d "{  \"user\": \"sa\",  \"password\": \"admin\"}"`
+
+Upload the notary:
+
+    pushd build/nodes/Notary
+    NODEINFO=`ls nodeInfo*`
+    curl -X POST -H "Authorization: Bearer $TOKEN" -H "accept: text/plain" -H "Content-Type: application/octet-stream" --data-binary @$NODEINFO http://localhost:8080//admin/api/notaries/validating
+    popd
+
+#### 1.6 Stop the notary node
+In the notary node shell, execute `bye`
+
+#### 1.7 Delete the network-parameters file on the notary node
+In the notary node directory, remove the `network-parameters` file
+
+#### 1.8 Start the notary node and other nodes
+Check that all the nodes have been registered with the NMS [http://localhost:8080](http://localhost:8080)
