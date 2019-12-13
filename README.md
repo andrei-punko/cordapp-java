@@ -71,7 +71,7 @@ the other nodes on the network:
 Check available flows by `flow list` command:
 
     Wed Dec 04 17:47:34 MSK 2019>>> flow list
-    com.template.flows.IOUFlow$Initiator
+    com.template.flows.iou.IOUFlow$Initiator
     net.corda.core.flows.ContractUpgradeFlow$Authorise
     net.corda.core.flows.ContractUpgradeFlow$Deauthorise
     net.corda.core.flows.ContractUpgradeFlow$Initiate

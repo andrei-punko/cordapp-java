@@ -1,8 +1,6 @@
-package com.template.flows;
+package com.template.flows.iou;
 
 import static junit.framework.TestCase.assertNull;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;

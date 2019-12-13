@@ -1,10 +1,16 @@
-package com.template.flows;
+package com.template.flows.iou;
 
+import static com.template.flows.tracker.ProgressTrackerBuilder.FINALISING_TRANSACTION;
+import static com.template.flows.tracker.ProgressTrackerBuilder.GATHERING_SIGS;
+import static com.template.flows.tracker.ProgressTrackerBuilder.GENERATING_TRANSACTION;
+import static com.template.flows.tracker.ProgressTrackerBuilder.SIGNING_TRANSACTION;
+import static com.template.flows.tracker.ProgressTrackerBuilder.VERIFYING_TRANSACTION;
 import static net.corda.core.contracts.ContractsDSL.requireThat;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.google.common.collect.ImmutableSet;
 import com.template.contracts.IOUContract;
+import com.template.flows.tracker.ProgressTrackerBuilder;
 import com.template.states.IOUState;
 import java.security.PublicKey;
 import java.util.Arrays;
@@ -26,7 +32,6 @@ import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
-import net.corda.core.utilities.ProgressTracker.Step;
 
 public class IOUFlow {
 
@@ -39,32 +44,10 @@ public class IOUFlow {
         private final Party otherParty;
         private final Integer iouValue;
 
-        private final Step GENERATING_TRANSACTION = new Step("Generating transaction based on new IOU.");
-        private final Step VERIFYING_TRANSACTION = new Step("Verifying contract constraints.");
-        private final Step SIGNING_TRANSACTION = new Step("Signing transaction with our private key.");
-        private final Step GATHERING_SIGS = new Step("Gathering the counterparty's signature.") {
-            @Override
-            public ProgressTracker childProgressTracker() {
-                return CollectSignaturesFlow.Companion.tracker();
-            }
-        };
-        private final Step FINALISING_TRANSACTION = new Step("Obtaining notary signature and recording transaction.") {
-            @Override
-            public ProgressTracker childProgressTracker() {
-                return FinalityFlow.Companion.tracker();
-            }
-        };
-
         /**
          * The progress tracker provides checkpoints indicating the progress of the flow to observers.
          */
-        private final ProgressTracker progressTracker = new ProgressTracker(
-            GENERATING_TRANSACTION,
-            VERIFYING_TRANSACTION,
-            SIGNING_TRANSACTION,
-            GATHERING_SIGS,
-            FINALISING_TRANSACTION
-        );
+        private final ProgressTracker progressTracker = ProgressTrackerBuilder.build();
 
         public Initiator(Party otherParty, Integer iouValue) {
             this.otherParty = otherParty;
