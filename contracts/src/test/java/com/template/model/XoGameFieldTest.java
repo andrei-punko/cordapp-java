@@ -105,4 +105,28 @@ public class XoGameFieldTest {
         assertThat("Field equals to another same field", field1.equals(field2), is(true));
         assertThat("Field unequals to another different field", field1.equals(field3), is(false));
     }
+
+    @Test
+    public void checkIsOnlyOneCellChanged() {
+        XoGameField field1 = new XoGameField(new XoState[][]{
+            {X, E, E},
+            {O, X, E},
+            {E, E, X}
+        });
+        XoGameField field2 = new XoGameField(new XoState[][]{
+            {X, E, E},
+            {O, X, E},
+            {E, O, X}
+        });
+        XoGameField field3 = new XoGameField(new XoState[][]{
+            {E, E, E},
+            {E, E, E},
+            {E, E, E}
+        });
+        assertThat("Should be false when check vs itself", field1.checkIsOnlyOneCellChanged(field1), is(false));
+        assertThat("Should be true when one cell changed", field1.checkIsOnlyOneCellChanged(field2), is(true));
+        assertThat("Should be true when one cell changed 2", field2.checkIsOnlyOneCellChanged(field1), is(true));
+        assertThat("Should be false when more than one cell changed", field1.checkIsOnlyOneCellChanged(field3), is(false));
+        assertThat("Should be false when more than one cell changed 2", field3.checkIsOnlyOneCellChanged(field1), is(false));
+    }
 }

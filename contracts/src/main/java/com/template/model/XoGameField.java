@@ -83,6 +83,21 @@ public class XoGameField {
         return (cells[0][0] == state && cells[2][2] == state) || (cells[2][0] == state && cells[0][2] == state);
     }
 
+    public boolean checkIsOnlyOneCellChanged(XoGameField gameField) {
+        boolean oneChangeFound = false;
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                if (this.get(row, col) != gameField.get(row, col)) {
+                    if (oneChangeFound) {
+                        return false;
+                    }
+                    oneChangeFound = true;
+                }
+            }
+        }
+        return oneChangeFound;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
