@@ -5,57 +5,17 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import com.google.common.collect.ImmutableList;
 import com.template.contracts.IOUContract;
+import com.template.flows.AbstractFlowTest;
 import com.template.states.IOUState;
 import java.util.Arrays;
 import net.corda.core.concurrent.CordaFuture;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.TransactionState;
-import net.corda.core.identity.CordaX500Name;
-import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
-import net.corda.testing.node.MockNetwork;
-import net.corda.testing.node.MockNetworkParameters;
-import net.corda.testing.node.StartedMockNode;
-import net.corda.testing.node.TestCordapp;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-public class IOUFlowTest {
-
-    private MockNetwork mockNetwork;
-    private StartedMockNode notaryNode;
-    private StartedMockNode nodeA;
-    private StartedMockNode nodeB;
-    private Party notaryParty;
-    private Party aParty;
-    private Party bParty;
-
-    @Before
-    public void setup() {
-        MockNetworkParameters mockNetworkParameters = new MockNetworkParameters(ImmutableList.of(
-            TestCordapp.findCordapp("com.template.contracts"),
-            TestCordapp.findCordapp("com.template.flows")
-        ));
-        mockNetwork = new MockNetwork(mockNetworkParameters);
-
-        notaryNode = mockNetwork.getNotaryNodes().get(0);
-        nodeA = mockNetwork.createPartyNode(new CordaX500Name("NodeA", "London", "GB"));
-        nodeB = mockNetwork.createPartyNode(new CordaX500Name("NodeB", "London", "GB"));
-
-        notaryParty = notaryNode.getInfo().getLegalIdentities().get(0);
-        aParty = nodeA.getInfo().getLegalIdentities().get(0);
-        bParty = nodeB.getInfo().getLegalIdentities().get(0);
-
-        mockNetwork.runNetwork();
-    }
-
-    @After
-    public void tearDown() {
-        mockNetwork.stopNodes();
-    }
+public class IOUFlowTest extends AbstractFlowTest {
 
     @Test
     public void testTransaction() throws Exception {
