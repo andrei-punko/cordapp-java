@@ -1,7 +1,9 @@
 package com.template.states;
 
+import com.google.common.collect.ImmutableList;
 import com.template.contracts.XoGameContract;
 import com.template.model.XoGameField;
+import com.template.schema.XoGameSchemaV1;
 import java.util.Arrays;
 import java.util.List;
 import net.corda.core.contracts.BelongsToContract;
@@ -9,13 +11,16 @@ import net.corda.core.contracts.LinearState;
 import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
+import net.corda.core.schemas.MappedSchema;
+import net.corda.core.schemas.PersistentState;
+import net.corda.core.schemas.QueryableState;
 import net.corda.core.serialization.ConstructorForDeserialization;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.jetbrains.annotations.NotNull;
 
 @BelongsToContract(XoGameContract.class)
-public class XoGameState implements LinearState {
+public class XoGameState implements LinearState, QueryableState {
 
     private final UniqueIdentifier linearId;
     private final String gameId;
@@ -100,5 +105,26 @@ public class XoGameState implements LinearState {
     @Override
     public List<AbstractParty> getParticipants() {
         return Arrays.asList(player1, player2);
+    }
+
+    @NotNull
+    @Override
+    public PersistentState generateMappedObject(@NotNull MappedSchema schema) {
+        if (schema instanceof XoGameSchemaV1) {
+            return new XoGameSchemaV1.PersistentXoGame(
+                this.linearId.getId(),
+                this.gameId,
+                this.player1.getName().toString(),
+                this.player2.getName().toString(),
+                this.gameField.toLinearString());
+        } else {
+            throw new IllegalArgumentException("Unrecognised schema $schema");
+        }
+    }
+
+    @NotNull
+    @Override
+    public Iterable<MappedSchema> supportedSchemas() {
+        return ImmutableList.of(new XoGameSchemaV1());
     }
 }
