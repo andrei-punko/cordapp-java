@@ -4,6 +4,7 @@ import static com.template.model.XoState.E;
 import static com.template.model.XoState.O;
 import static com.template.model.XoState.X;
 
+import net.corda.core.serialization.ConstructorForDeserialization;
 import net.corda.core.serialization.CordaSerializable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -21,8 +22,38 @@ public class XoGameField {
         });
     }
 
+    @ConstructorForDeserialization
     public XoGameField(XoState[][] cells) {
         this.cells = cells;
+    }
+
+    public XoGameField(String str) {
+        if (str.length() != 9) {
+            throw new IllegalArgumentException("To create game field - 9 characters expected");
+        }
+        cells = new XoState[3][3];
+        int row = 0;
+        int col = 0;
+        for (Character ch : str.toCharArray()) {
+            switch (ch) {
+                case 'X':
+                    cells[row][col] = X;
+                    break;
+                case 'O':
+                    cells[row][col] = O;
+                    break;
+                case '-':
+                    cells[row][col] = E;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown character: " + ch);
+            }
+            col++;
+            if (col > 2) {
+                col = 0;
+                row++;
+            }
+        }
     }
 
     public XoState get(int row, int col) {
@@ -120,5 +151,47 @@ public class XoGameField {
         return new HashCodeBuilder(17, 37)
             .append(cells)
             .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        String result = "";
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                char ch = ' ';
+                switch (cells[row][col]) {
+                    case X:
+                        ch = 'X';
+                        break;
+                    case O:
+                        ch = 'O';
+                        break;
+                }
+                result += String.format(" %s |", ch);
+            }
+            result = result.substring(0, result.length() - 1);
+            result += "---|---|---";
+        }
+        return result.substring(0, result.length() - 11);
+    }
+
+    public String toLinearString() {
+        String result = "";
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                switch (cells[row][col]) {
+                    case E:
+                        result += '-';
+                        break;
+                    case X:
+                        result += 'X';
+                        break;
+                    case O:
+                        result += 'O';
+                        break;
+                }
+            }
+        }
+        return result;
     }
 }

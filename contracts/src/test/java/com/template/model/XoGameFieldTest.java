@@ -5,6 +5,7 @@ import static com.template.model.XoState.O;
 import static com.template.model.XoState.X;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
@@ -128,5 +129,52 @@ public class XoGameFieldTest {
         assertThat("Should be true when one cell changed 2", field2.checkIsOnlyOneCellChanged(field1), is(true));
         assertThat("Should be false when more than one cell changed", field1.checkIsOnlyOneCellChanged(field3), is(false));
         assertThat("Should be false when more than one cell changed 2", field3.checkIsOnlyOneCellChanged(field1), is(false));
+    }
+
+    @Test
+    public void testGameFieldCreationFromStringForStringWithWrongLength() {
+        try {
+            new XoGameField("---");
+            fail("Exception should be thrown");
+        } catch (IllegalArgumentException iae) {
+            assertThat(iae.getMessage(), is("To create game field - 9 characters expected"));
+        }
+    }
+
+    @Test
+    public void testGameFieldCreationFromStringForStringWithUnknownCharacter() {
+        try {
+            new XoGameField("-------Z-");
+            fail("Exception should be thrown");
+        } catch (IllegalArgumentException iae) {
+            assertThat(iae.getMessage(), is("Unknown character: Z"));
+        }
+    }
+
+    @Test
+    public void testGameFieldCreationFromString() {
+        XoGameField field = new XoGameField("-O--X-OX-");
+        assertThat(field.equals(new XoGameField(new XoState[][]{
+            {E, O, E},
+            {E, X, E},
+            {O, X, E}
+        })), is(true));
+    }
+
+    @Test
+    public void testToString() {
+        XoGameField field = new XoGameField("-O--X-OX-");
+        assertThat(field.toString(), is(""
+            + "   | O |   "
+            + "---|---|---"
+            + "   | X |   "
+            + "---|---|---"
+            + " O | X |   "));
+    }
+
+    @Test
+    public void testToLinearString() {
+        XoGameField field = new XoGameField("-O--X-OX-");
+        assertThat(field.toLinearString(), is("-O--X-OX-"));
     }
 }
