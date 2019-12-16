@@ -30,7 +30,7 @@ public class XoGameState implements LinearState, QueryableState {
     private final XoGameField gameField;
 
     public XoGameState(String gameId, Party player1, Party player2) {
-        this(gameId, player1, player2, player1, new XoGameField());
+        this(gameId, player1, player2, player1);
     }
 
     public XoGameState(String gameId, Party player1, Party player2, Party nextTurnOwner) {
