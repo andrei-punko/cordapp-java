@@ -94,7 +94,7 @@ public class XoGameContract implements Contract {
                 require.using("Game field should be changed",
                     !in.getGameField().equals(out.getGameField()));
                 require.using("Only one cell should be changed",
-                    in.getGameField().checkIsOnlyOneCellChanged(out.getGameField()));
+                    in.getGameField().checkIsOnlyOneCellChanged(out.getGameField(), in.determineNextTurnSymbol()));
 
                 // Constraints on the signers.
                 checkSignersConstraint(cmd, out);
