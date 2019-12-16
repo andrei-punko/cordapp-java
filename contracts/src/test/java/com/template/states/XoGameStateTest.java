@@ -8,6 +8,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import com.template.model.XoGameField;
 import com.template.model.XoState;
@@ -22,6 +23,7 @@ public class XoGameStateTest {
 
     private final TestIdentity alice = new TestIdentity(new CordaX500Name("Alice", "London", "GB"));
     private final TestIdentity bob = new TestIdentity(new CordaX500Name("Bob", "Glasgow", "GB"));
+    private final TestIdentity incognito = new TestIdentity(new CordaX500Name("Incognito", "Glasgow", "GB"));
 
     @Test
     public void testInitGameConstructor() {
@@ -54,6 +56,17 @@ public class XoGameStateTest {
         assertThat(gameState.getGameField(), is(gameField));
         assertThat(gameState.getParticipants().size(), is(2));
         assertThat(gameState.getParticipants(), hasItems(alice.getParty(), bob.getParty()));
+    }
+
+    @Test
+    public void testConstructorWithWrongOpponent() {
+        final String gameId = "12345";
+        try {
+            new XoGameState(gameId, alice.getParty(), bob.getParty(), incognito.getParty());
+            fail("Exception should be thrown");
+        } catch (IllegalArgumentException iae) {
+            assertThat(iae.getMessage(), is("NextTurnOwner should be one of players"));
+        }
     }
 
     @Test

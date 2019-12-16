@@ -43,6 +43,9 @@ public class XoGameState implements LinearState, QueryableState {
      */
     @ConstructorForDeserialization
     public XoGameState(String gameId, Party player1, Party player2, Party nextTurnOwner, XoGameField gameField) {
+        if (!nextTurnOwner.equals(player1) && !nextTurnOwner.equals(player2)) {
+            throw new IllegalArgumentException("NextTurnOwner should be one of players");
+        }
         this.linearId = new UniqueIdentifier(gameId);
         this.gameId = gameId;
         this.player1 = player1;
