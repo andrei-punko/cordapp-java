@@ -28,7 +28,7 @@ public class XoGameContractTest {
     @Before
     public void setup() {
         xoGameState = new XoGameState("First game", alice.getParty(), bob.getParty());
-        xoGameState2 = new XoGameState("First game", alice.getParty(), bob.getParty(), new XoGameField(new XoState[][]{
+        xoGameState2 = new XoGameState("First game", alice.getParty(), bob.getParty(), bob.getParty(), new XoGameField(new XoState[][]{
             {E, E, E},
             {E, X, E},
             {E, E, E}
@@ -183,6 +183,19 @@ public class XoGameContractTest {
     }
 
     @Test
+    public void xoGameContractStartGameNextTurnOwnerShouldBePlayer1() {
+        xoGameState = new XoGameState(xoGameState.getGameId(), alice.getParty(), bob.getParty(), bob.getParty());
+        ledger(ledgerServices, l -> {
+            l.transaction(tx -> {
+                tx.output(XoGameContract.ID, xoGameState);
+                tx.command(Arrays.asList(alice.getPublicKey(), bob.getPublicKey()), new XoGameContract.Commands.StartGame());
+                return tx.failsWith("NextTurnOwner should be player1");
+            });
+            return Unit.INSTANCE;
+        });
+    }
+
+    @Test
     public void xoGameContractStartGameOutGameIdShouldBePresent() {
         xoGameState = new XoGameState(null, alice.getParty(), bob.getParty());
         ledger(ledgerServices, l -> {
@@ -197,54 +210,12 @@ public class XoGameContractTest {
 
     @Test
     public void xoGameContractStartGameOutGameFieldShouldBePresent() {
-        xoGameState = new XoGameState(xoGameState.getGameId(), alice.getParty(), bob.getParty(), null);
+        xoGameState = new XoGameState(xoGameState.getGameId(), alice.getParty(), bob.getParty(), alice.getParty(), null);
         ledger(ledgerServices, l -> {
             l.transaction(tx -> {
                 tx.output(XoGameContract.ID, xoGameState);
                 tx.command(Arrays.asList(alice.getPublicKey(), bob.getPublicKey()), new XoGameContract.Commands.StartGame());
                 return tx.failsWith("Game field should be present");
-            });
-            return Unit.INSTANCE;
-        });
-    }
-
-    @Test
-    public void xoGameContractMakeStepInputPlayersShouldBeDifferent() {
-        xoGameState = new XoGameState(xoGameState.getGameId(), alice.getParty(), alice.getParty());
-        ledger(ledgerServices, l -> {
-            l.transaction(tx -> {
-                tx.input(XoGameContract.ID, xoGameState);
-                tx.output(XoGameContract.ID, xoGameState2);
-                tx.command(Arrays.asList(alice.getPublicKey(), bob.getPublicKey()), new XoGameContract.Commands.MakeStep());
-                return tx.failsWith("Input players should be different.");
-            });
-            return Unit.INSTANCE;
-        });
-    }
-
-    @Test
-    public void xoGameContractMakeStepInputGameIdShouldBePresent() {
-        xoGameState = new XoGameState(null, alice.getParty(), bob.getParty());
-        ledger(ledgerServices, l -> {
-            l.transaction(tx -> {
-                tx.input(XoGameContract.ID, xoGameState);
-                tx.output(XoGameContract.ID, xoGameState2);
-                tx.command(Arrays.asList(alice.getPublicKey(), bob.getPublicKey()), new XoGameContract.Commands.MakeStep());
-                return tx.failsWith("Input game id should be present");
-            });
-            return Unit.INSTANCE;
-        });
-    }
-
-    @Test
-    public void xoGameContractMakeStepInputGameFieldShouldBePresent() {
-        xoGameState = new XoGameState(xoGameState.getGameId(), alice.getParty(), bob.getParty(), null);
-        ledger(ledgerServices, l -> {
-            l.transaction(tx -> {
-                tx.input(XoGameContract.ID, xoGameState);
-                tx.output(XoGameContract.ID, xoGameState2);
-                tx.command(Arrays.asList(alice.getPublicKey(), bob.getPublicKey()), new XoGameContract.Commands.MakeStep());
-                return tx.failsWith("Input game field should be present");
             });
             return Unit.INSTANCE;
         });
@@ -280,7 +251,7 @@ public class XoGameContractTest {
 
     @Test
     public void xoGameContractMakeStepOutputGameFieldShouldBePresent() {
-        xoGameState2 = new XoGameState(xoGameState.getGameId(), alice.getParty(), bob.getParty(), null);
+        xoGameState2 = new XoGameState(xoGameState.getGameId(), alice.getParty(), bob.getParty(), alice.getParty(), null);
         ledger(ledgerServices, l -> {
             l.transaction(tx -> {
                 tx.input(XoGameContract.ID, xoGameState);
@@ -293,8 +264,22 @@ public class XoGameContractTest {
     }
 
     @Test
+    public void xoGameContractMakeStepNextTurnOwnerShouldBeDifferent() {
+        xoGameState2 = new XoGameState(xoGameState.getGameId(), alice.getParty(), bob.getParty(), alice.getParty());
+        ledger(ledgerServices, l -> {
+            l.transaction(tx -> {
+                tx.input(XoGameContract.ID, xoGameState);
+                tx.output(XoGameContract.ID, xoGameState2);
+                tx.command(Arrays.asList(alice.getPublicKey(), bob.getPublicKey()), new XoGameContract.Commands.MakeStep());
+                return tx.failsWith("NextTurnOwner should be different.");
+            });
+            return Unit.INSTANCE;
+        });
+    }
+
+    @Test
     public void xoGameContractMakeStepGameIdShouldBeTheSame() {
-        xoGameState2 = new XoGameState("Another game", alice.getParty(), bob.getParty());
+        xoGameState2 = new XoGameState("Another game", alice.getParty(), bob.getParty(), bob.getParty());
         ledger(ledgerServices, l -> {
             l.transaction(tx -> {
                 tx.input(XoGameContract.ID, xoGameState);
@@ -322,7 +307,7 @@ public class XoGameContractTest {
 
     @Test
     public void xoGameContractMakeStepPlayer2ShouldBeTheSame() {
-        xoGameState2 = new XoGameState(xoGameState.getGameId(), alice.getParty(), incognito.getParty());
+        xoGameState2 = new XoGameState(xoGameState.getGameId(), alice.getParty(), incognito.getParty(), incognito.getParty());
         ledger(ledgerServices, l -> {
             l.transaction(tx -> {
                 tx.input(XoGameContract.ID, xoGameState);
@@ -336,7 +321,7 @@ public class XoGameContractTest {
 
     @Test
     public void xoGameContractMakeStepGameFieldShouldBeChanged() {
-        xoGameState2 = new XoGameState(xoGameState.getGameId(), alice.getParty(), bob.getParty(), xoGameState.getGameField());
+        xoGameState2 = new XoGameState(xoGameState.getGameId(), alice.getParty(), bob.getParty(), bob.getParty(), xoGameState.getGameField());
         ledger(ledgerServices, l -> {
             l.transaction(tx -> {
                 tx.input(XoGameContract.ID, xoGameState);
@@ -350,7 +335,7 @@ public class XoGameContractTest {
 
     @Test
     public void xoGameContractMakeStepOnlyOneCellOfGameFieldShouldBeChanged() {
-        xoGameState2 = new XoGameState(xoGameState.getGameId(), alice.getParty(), bob.getParty(), new XoGameField(new XoState[][]{
+        xoGameState2 = new XoGameState(xoGameState.getGameId(), alice.getParty(), bob.getParty(), bob.getParty(), new XoGameField(new XoState[][]{
             {E, E, X},
             {E, X, E},
             {X, E, E}

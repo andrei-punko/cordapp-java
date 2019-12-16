@@ -50,6 +50,8 @@ public class XoGameContract implements Contract {
                 XoGameState out = tx.outputsOfType(XoGameState.class).get(0);
                 require.using("Players should be different.",
                     !out.getPlayer1().equals(out.getPlayer2()));
+                require.using("NextTurnOwner should be player1",
+                    out.getNextTurnOwner().equals(out.getPlayer1()));
                 require.using("Game id should be present",
                     StringUtils.isNoneBlank(out.getGameId()));
                 require.using("Game field should be present",
@@ -72,14 +74,6 @@ public class XoGameContract implements Contract {
                     tx.getOutputs().size() == 1);
 
                 // XoGame-specific constraints.
-                XoGameState in = tx.inputsOfType(XoGameState.class).get(0);
-                require.using("Input players should be different.",
-                    !in.getPlayer1().equals(in.getPlayer2()));
-                require.using("Input game id should be present",
-                    StringUtils.isNoneBlank(in.getGameId()));
-                require.using("Input game field should be present",
-                    in.getGameField() != null);
-
                 XoGameState out = tx.outputsOfType(XoGameState.class).get(0);
                 require.using("Output players should be different.",
                     !out.getPlayer1().equals(out.getPlayer2()));
@@ -88,6 +82,9 @@ public class XoGameContract implements Contract {
                 require.using("Output game field should be present",
                     out.getGameField() != null);
 
+                XoGameState in = tx.inputsOfType(XoGameState.class).get(0);
+                require.using("NextTurnOwner should be different.",
+                    !in.getNextTurnOwner().equals(out.getNextTurnOwner()));
                 require.using("Game id should be the same",
                     in.getGameId().equals(out.getGameId()));
                 require.using("Player1 should be the same",

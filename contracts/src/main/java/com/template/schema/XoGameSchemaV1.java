@@ -28,14 +28,17 @@ public class XoGameSchemaV1 extends MappedSchema {
         private final String player1;
         @Column(name = "player2")
         private final String player2;
+        @Column(name = "next_turn_owner")
+        private final String nextTurnOwner;
         @Column(name = "game_field")
         private final String gameField;
 
-        public PersistentXoGame(UUID linearId, String gameId, String player1, String player2, String gameField) {
+        public PersistentXoGame(UUID linearId, String gameId, String player1, String player2, String nextTurnOwner, String gameField) {
             this.linearId = linearId;
             this.gameId = gameId;
             this.player1 = player1;
             this.player2 = player2;
+            this.nextTurnOwner = nextTurnOwner;
             this.gameField = gameField;
         }
 
@@ -44,6 +47,7 @@ public class XoGameSchemaV1 extends MappedSchema {
             this.gameId = null;
             this.player1 = null;
             this.player2 = null;
+            this.nextTurnOwner = null;
             this.gameField = null;
         }
 
@@ -61,6 +65,10 @@ public class XoGameSchemaV1 extends MappedSchema {
 
         public String getPlayer2() {
             return player2;
+        }
+
+        public String getNextTurnOwner() {
+            return nextTurnOwner;
         }
 
         public String getGameField() {
