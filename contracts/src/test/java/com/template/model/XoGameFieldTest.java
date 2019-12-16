@@ -162,9 +162,9 @@ public class XoGameFieldTest {
     }
 
     @Test
-    public void testToString() {
+    public void testToPrettyPrintString() {
         XoGameField field = new XoGameField("-O--X-OX-");
-        assertThat(field.toString(), is(""
+        assertThat(field.toPrettyPrintString(), is(""
             + "   | O |   "
             + "---|---|---"
             + "   | X |   "
@@ -175,6 +175,6 @@ public class XoGameFieldTest {
     @Test
     public void testToLinearString() {
         XoGameField field = new XoGameField("-O--X-OX-");
-        assertThat(field.toLinearString(), is("-O--X-OX-"));
+        assertThat(field.toString(), is("-O--X-OX-"));
     }
 }

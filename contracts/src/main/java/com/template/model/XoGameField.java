@@ -22,11 +22,11 @@ public class XoGameField {
         });
     }
 
-    @ConstructorForDeserialization
     public XoGameField(XoState[][] cells) {
         this.cells = cells;
     }
 
+    @ConstructorForDeserialization
     public XoGameField(String str) {
         if (str.length() != 9) {
             throw new IllegalArgumentException("To create game field - 9 characters expected");
@@ -54,6 +54,13 @@ public class XoGameField {
                 row++;
             }
         }
+    }
+
+    /**
+     * Such getter required for serialization because we have constructor parameter with name `str`
+     */
+    public String getStr() {
+        return toString();
     }
 
     public XoState get(int row, int col) {
@@ -153,8 +160,7 @@ public class XoGameField {
             .toHashCode();
     }
 
-    @Override
-    public String toString() {
+    public String toPrettyPrintString() {
         String result = "";
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
@@ -175,7 +181,8 @@ public class XoGameField {
         return result.substring(0, result.length() - 11);
     }
 
-    public String toLinearString() {
+    @Override
+    public String toString() {
         String result = "";
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
