@@ -157,9 +157,9 @@ public class XoGameState implements LinearState, QueryableState {
      * @return
      */
     public XoState determineNextTurnSymbol() {
-        if (nextTurnOwner == player1) {
+        if (nextTurnOwner.equals(player1)) {
             return XoState.X;
-        } else if (nextTurnOwner == player2) {
+        } else if (nextTurnOwner.equals(player2)) {
             return XoState.O;
         } else {
             throw new IllegalStateException("NextTurnOwner should be one of players");
