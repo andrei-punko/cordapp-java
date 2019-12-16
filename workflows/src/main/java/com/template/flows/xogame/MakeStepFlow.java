@@ -73,11 +73,11 @@ public class MakeStepFlow {
             // Step 1
             progressTracker.setCurrentStep(GENERATING_TRANSACTION);
             QueryCriteria queryCriteria = new QueryCriteria.LinearStateQueryCriteria(
-                null, //ImmutableList.of(me, opponent),
+                ImmutableList.of(me, opponent),
                 null,
                 ImmutableList.of(gameId),
                 Vault.StateStatus.UNCONSUMED,
-                null //ImmutableSet.of(XoGameState.class)
+                ImmutableSet.of(XoGameState.class)
             );
 
             Vault.Page<XoGameState> results = getServiceHub().getVaultService().queryBy(XoGameState.class, queryCriteria);
