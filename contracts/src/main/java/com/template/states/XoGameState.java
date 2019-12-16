@@ -3,6 +3,7 @@ package com.template.states;
 import com.google.common.collect.ImmutableList;
 import com.template.contracts.XoGameContract;
 import com.template.model.XoGameField;
+import com.template.model.XoState;
 import com.template.schema.XoGameSchemaV1;
 import java.util.Arrays;
 import java.util.List;
@@ -149,5 +150,19 @@ public class XoGameState implements LinearState, QueryableState {
             ", nextTurnOwner=" + nextTurnOwner +
             ", gameField=" + gameField +
             '}';
+    }
+
+    /**
+     * We sit on convention that player1 uses 'X' and player2 - 'O' symbols.
+     * @return
+     */
+    public XoState determineNextTurnSymbol() {
+        if (nextTurnOwner == player1) {
+            return XoState.X;
+        } else if (nextTurnOwner == player2) {
+            return XoState.O;
+        } else {
+            throw new IllegalStateException("NextTurnOwner should be one of players");
+        }
     }
 }

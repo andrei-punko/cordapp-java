@@ -131,4 +131,21 @@ public class XoGameStateTest {
         assertThat("State hashCode equals to another same state hashCode", state1.hashCode(), is(state2.hashCode()));
         assertThat("State hashCode unequals to another different state hashCode", state1.hashCode(), is(not(state3.hashCode())));
     }
+
+    @Test
+    public void testDetermineNextTurnSymbol() {
+        XoGameState state1 = new XoGameState("12345", alice.getParty(), bob.getParty(), alice.getParty(), new XoGameField(new XoState[][]{
+            {X, E, E},
+            {O, X, E},
+            {E, E, X}
+        }));
+        XoGameState state2 = new XoGameState("12345", alice.getParty(), bob.getParty(), bob.getParty(), new XoGameField(new XoState[][]{
+            {X, E, E},
+            {O, X, E},
+            {E, E, X}
+        }));
+
+        assertThat(state1.determineNextTurnSymbol(), is(XoState.X));
+        assertThat(state2.determineNextTurnSymbol(), is(XoState.O));
+    }
 }
