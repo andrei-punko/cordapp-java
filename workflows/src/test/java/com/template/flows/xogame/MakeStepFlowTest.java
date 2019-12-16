@@ -19,19 +19,18 @@ import org.junit.Test;
 
 public class MakeStepFlowTest extends AbstractFlowTest {
 
-    // TODO: make this test working
     @Test
     public void testTransaction() throws Exception {
         final String gameId = StringUtils.randomIdentifer(10);
         final Party opponent = bParty;
         StartGameFlow.Initiator startGameFlow = new StartGameFlow.Initiator(gameId, opponent);
         CordaFuture<SignedTransaction> startGameFuture = nodeA.startFlow(startGameFlow);
-
-        final String newField = "----X----";
-        MakeStepFlow.Initiator flow = new MakeStepFlow.Initiator(gameId, bParty, newField);
-        CordaFuture<SignedTransaction> makeStepFuture = nodeA.startFlow(flow);
         mockNetwork.runNetwork();
         startGameFuture.get();
+
+        final String newField = "----X----";
+        MakeStepFlow.Initiator flow = new MakeStepFlow.Initiator(gameId, opponent, newField);
+        CordaFuture<SignedTransaction> makeStepFuture = nodeA.startFlow(flow);
         mockNetwork.runNetwork();
         SignedTransaction signedTransaction = makeStepFuture.get();
 
@@ -46,6 +45,7 @@ public class MakeStepFlowTest extends AbstractFlowTest {
         assertThat("Wrong game id", xoGameState.getGameId(), is(gameId));
         assertThat("Wrong player1", xoGameState.getPlayer1(), is(aParty));
         assertThat("Wrong player2", xoGameState.getPlayer2(), is(bParty));
+        assertThat("Wrong nextTurnOwner", xoGameState.getNextTurnOwner(), is(bParty));
         assertThat("Wrong game field", xoGameState.getGameField(), is(new XoGameField(newField)));
 
         assertThat("One command expected", signedTransaction.getTx().getCommands().size(), is(1));

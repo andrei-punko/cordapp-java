@@ -1,6 +1,7 @@
 package com.template.flows;
 
 import com.google.common.collect.ImmutableList;
+import java.util.concurrent.TimeUnit;
 import net.corda.core.identity.CordaX500Name;
 import net.corda.core.identity.Party;
 import net.corda.testing.node.MockNetwork;
@@ -9,33 +10,28 @@ import net.corda.testing.node.StartedMockNode;
 import net.corda.testing.node.TestCordapp;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.Timeout;
 
 public abstract class AbstractFlowTest {
 
-    protected MockNetwork mockNetwork;
-    protected StartedMockNode notaryNode;
-    protected StartedMockNode nodeA;
-    protected StartedMockNode nodeB;
-    protected Party notaryParty;
-    protected Party aParty;
-    protected Party bParty;
+    @Rule
+    public Timeout globalTimeout = new Timeout(2, TimeUnit.MINUTES);
+
+    protected final MockNetwork mockNetwork = new MockNetwork(new MockNetworkParameters(ImmutableList.of(
+        TestCordapp.findCordapp("com.template.contracts"),
+        TestCordapp.findCordapp("com.template.flows")
+    )));
+    protected StartedMockNode notaryNode = mockNetwork.getNotaryNodes().get(0);
+    protected final StartedMockNode nodeA = mockNetwork.createPartyNode(new CordaX500Name("NodeA", "London", "GB"));
+    protected final StartedMockNode nodeB = mockNetwork.createPartyNode(new CordaX500Name("NodeB", "Minsk", "BY"));
+
+    protected Party notaryParty = notaryNode.getInfo().getLegalIdentities().get(0);
+    protected Party aParty = nodeA.getInfo().getLegalIdentities().get(0);
+    protected Party bParty = nodeB.getInfo().getLegalIdentities().get(0);
 
     @Before
     public void setup() {
-        MockNetworkParameters mockNetworkParameters = new MockNetworkParameters(ImmutableList.of(
-            TestCordapp.findCordapp("com.template.contracts"),
-            TestCordapp.findCordapp("com.template.flows")
-        ));
-        mockNetwork = new MockNetwork(mockNetworkParameters);
-
-        notaryNode = mockNetwork.getNotaryNodes().get(0);
-        nodeA = mockNetwork.createPartyNode(new CordaX500Name("NodeA", "London", "GB"));
-        nodeB = mockNetwork.createPartyNode(new CordaX500Name("NodeB", "London", "GB"));
-
-        notaryParty = notaryNode.getInfo().getLegalIdentities().get(0);
-        aParty = nodeA.getInfo().getLegalIdentities().get(0);
-        bParty = nodeB.getInfo().getLegalIdentities().get(0);
-
         mockNetwork.runNetwork();
     }
 

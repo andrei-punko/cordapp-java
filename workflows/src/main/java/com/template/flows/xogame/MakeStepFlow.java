@@ -11,14 +11,12 @@ import co.paralleluniverse.fibers.Suspendable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.template.contracts.XoGameContract;
-import com.template.contracts.XoGameContract.Commands.StartGame;
 import com.template.flows.tracker.ProgressTrackerBuilder;
 import com.template.model.XoGameField;
 import com.template.states.XoGameState;
-import java.security.PublicKey;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import kotlin.Pair;
+import java.util.Set;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.StateAndRef;
@@ -80,7 +78,7 @@ public class MakeStepFlow {
                 ImmutableList.of(gameId),
                 Vault.StateStatus.UNCONSUMED,
                 null //ImmutableSet.of(XoGameState.class)
-                );
+            );
 
             Vault.Page<XoGameState> results = getServiceHub().getVaultService().queryBy(XoGameState.class, queryCriteria);
             List<StateAndRef<XoGameState>> states = results.getStates();
@@ -89,10 +87,27 @@ public class MakeStepFlow {
             } else if (states.size() > 1) {
                 throw new IllegalArgumentException("There are more than one required state");
             }
+
             StateAndRef<XoGameState> inputStateAndRef = states.get(0);
             XoGameState inputState = inputStateAndRef.getState().getData();
             getLogger().info(inputState.toString());
-            XoGameState outputState = new XoGameState(gameId, me, opponent, new XoGameField(newField));;
+
+            if (!inputState.getNextTurnOwner().equals(me)) {
+                throw new IllegalArgumentException("It's not this node turn");
+            }
+
+            Set<Party> players = new HashSet<>();
+            players.add(inputState.getPlayer1());
+            players.add(inputState.getPlayer2());
+            players.remove(me);
+            if (!players.contains(opponent)) {
+                throw new IllegalArgumentException("Wrong opponent");
+            }
+
+            XoGameState outputState = new XoGameState(gameId,
+                inputState.getPlayer1(),
+                inputState.getPlayer2(),
+                opponent, new XoGameField(newField));
             getLogger().info(outputState.toString());
 
             final Command<XoGameContract.Commands.MakeStep> txCommand = new Command<>(
@@ -147,6 +162,7 @@ public class MakeStepFlow {
         public SignedTransaction call() throws FlowException {
 
             class SignTxFlow extends SignTransactionFlow {
+
                 private SignTxFlow(FlowSession otherPartySession, ProgressTracker progressTracker) {
                     super(otherPartySession, progressTracker);
                 }
