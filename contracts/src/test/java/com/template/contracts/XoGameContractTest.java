@@ -345,7 +345,22 @@ public class XoGameContractTest {
                 tx.input(XoGameContract.ID, xoGameState);
                 tx.output(XoGameContract.ID, xoGameState2);
                 tx.command(Arrays.asList(alice.getPublicKey(), bob.getPublicKey()), new XoGameContract.Commands.MakeStep());
-                return tx.failsWith("Only one cell should be changed");
+                return tx.failsWith("Cell change is invalid");
+            });
+            return Unit.INSTANCE;
+        });
+
+        xoGameState2 = new XoGameState(xoGameState.getGameId(), alice.getParty(), bob.getParty(), bob.getParty(), new XoGameField(new XoState[][]{
+            {E, E, E},
+            {E, X, E},
+            {X, E, E}   // Change by X instead of O
+        }));
+        ledger(ledgerServices, l -> {
+            l.transaction(tx -> {
+                tx.input(XoGameContract.ID, xoGameState);
+                tx.output(XoGameContract.ID, xoGameState2);
+                tx.command(Arrays.asList(alice.getPublicKey(), bob.getPublicKey()), new XoGameContract.Commands.MakeStep());
+                return tx.failsWith("Cell change is invalid");
             });
             return Unit.INSTANCE;
         });

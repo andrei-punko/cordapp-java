@@ -124,12 +124,12 @@ public class XoGameFieldTest {
             {E, E, E},
             {E, E, E}
         });
-        assertThat("Should be false when no cells changed", field1.checkIsOnlyOneCellChanged(field1, X), is(false));
-        assertThat("Should be false when no cells changed 2", field1.checkIsOnlyOneCellChanged(field1, O), is(false));
-        assertThat("Should be true when one cell changed", field1.checkIsOnlyOneCellChanged(field2, O), is(true));
-        assertThat("Should be false when one cell changed but another character expected", field1.checkIsOnlyOneCellChanged(field2, X), is(false));
-        assertThat("Should be false when more than one cell changed", field1.checkIsOnlyOneCellChanged(field3, X), is(false));
-        assertThat("Should be false when more than one cell changed 2", field1.checkIsOnlyOneCellChanged(field3, O), is(false));
+        assertThat("when no cells changed", field1.checkCellChangeValidity(field1, X), is(false));
+        assertThat("when no cells changed 2", field1.checkCellChangeValidity(field1, O), is(false));
+        assertThat("when one cell changed", field1.checkCellChangeValidity(field2, O), is(true));
+        assertThat("when one cell changed but another character expected", field1.checkCellChangeValidity(field2, X), is(false));
+        assertThat("when more than one cell changed", field1.checkCellChangeValidity(field3, X), is(false));
+        assertThat("when more than one cell changed 2", field1.checkCellChangeValidity(field3, O), is(false));
     }
 
     @Test

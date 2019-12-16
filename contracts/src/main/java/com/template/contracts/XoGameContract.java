@@ -2,17 +2,13 @@ package com.template.contracts;
 
 import static net.corda.core.contracts.ContractsDSL.requireThat;
 
-import com.template.model.XoGameField;
 import com.template.states.XoGameState;
 import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import net.corda.core.contracts.CommandData;
 import net.corda.core.contracts.CommandWithParties;
 import net.corda.core.contracts.Contract;
-import net.corda.core.contracts.ContractState;
-import net.corda.core.identity.AbstractParty;
 import net.corda.core.transactions.LedgerTransaction;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -93,8 +89,8 @@ public class XoGameContract implements Contract {
                     in.getPlayer2().equals(out.getPlayer2()));
                 require.using("Game field should be changed",
                     !in.getGameField().equals(out.getGameField()));
-                require.using("Only one cell should be changed",
-                    in.getGameField().checkIsOnlyOneCellChanged(out.getGameField(), in.determineNextTurnSymbol()));
+                require.using("Cell change is invalid",
+                    in.getGameField().checkCellChangeValidity(out.getGameField(), in.determineNextTurnSymbol()));
 
                 // Constraints on the signers.
                 checkSignersConstraint(cmd, out);

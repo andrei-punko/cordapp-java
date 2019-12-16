@@ -121,7 +121,7 @@ public class XoGameField {
         return (cells[0][0] == state && cells[2][2] == state) || (cells[2][0] == state && cells[0][2] == state);
     }
 
-    public boolean checkIsOnlyOneCellChanged(XoGameField gameField, XoState expectedNewState) {
+    public boolean checkCellChangeValidity(XoGameField gameField, XoState expectedNewState) {
         boolean oneChangeFound = false;
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
