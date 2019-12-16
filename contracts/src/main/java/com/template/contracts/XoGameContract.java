@@ -56,14 +56,7 @@ public class XoGameContract implements Contract {
                     out.getGameField() != null);
 
                 // Constraints on the signers.
-                List<PublicKey> signers = cmd.getSigners();
-                List<PublicKey> expectedSigners = Arrays.asList(out.getPlayer1().getOwningKey(), out.getPlayer2().getOwningKey());
-                if (signers.size() != 2) {
-                    throw new IllegalArgumentException("There must be two signers.");
-                }
-                if (!signers.containsAll(expectedSigners)) {
-                    throw new IllegalArgumentException("Both players must be signers.");
-                }
+                checkSignersConstraint(cmd, out);
                 return null;
             }
         );
@@ -107,17 +100,21 @@ public class XoGameContract implements Contract {
                     in.getGameField().checkIsOnlyOneCellChanged(out.getGameField()));
 
                 // Constraints on the signers.
-                List<PublicKey> signers = cmd.getSigners();
-                List<PublicKey> expectedSigners = Arrays.asList(out.getPlayer1().getOwningKey(), out.getPlayer2().getOwningKey());
-                if (signers.size() != 2) {
-                    throw new IllegalArgumentException("There must be two signers.");
-                }
-                if (!signers.containsAll(expectedSigners)) {
-                    throw new IllegalArgumentException("Both players must be signers.");
-                }
+                checkSignersConstraint(cmd, out);
                 return null;
             }
         );
+    }
+
+    private void checkSignersConstraint(CommandWithParties<CommandData> cmd, XoGameState out) {
+        List<PublicKey> signers = cmd.getSigners();
+        List<PublicKey> expectedSigners = Arrays.asList(out.getPlayer1().getOwningKey(), out.getPlayer2().getOwningKey());
+        if (signers.size() != 2) {
+            throw new IllegalArgumentException("There must be two signers.");
+        }
+        if (!signers.containsAll(expectedSigners)) {
+            throw new IllegalArgumentException("Both players must be signers.");
+        }
     }
 
     // Used to indicate the transaction's intent.
