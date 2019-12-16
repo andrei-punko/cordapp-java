@@ -1,7 +1,10 @@
 
-# "I owe you" (IoU) blockchain app example using Corda platform 
+# Example of Corda platform usage
+Contains two applications:
+- "I owe you" (IoU) blockchain-based application
+- XO game over blockchain
 
-**Based on Java version of the CorDapp template taken from [here](https://github.com/corda/cordapp-template-java). 
+**Based on Java version of the CorDapp template taken from [here](https://github.com/corda/cordapp-template-java).   
 The Kotlin template situated [here](https://github.com/corda/cordapp-template-kotlin/).**
 
 ###### CorDapp (Corda Distributed Application) - distributed applications that run on the Corda platform
@@ -15,13 +18,13 @@ See https://docs.corda.net/tutorial-cordapp.html#running-the-example-cordapp for
 In short: we can run this `deployNodes` task using Gradle. For each node definition, Gradle will:
 
 - Package the project’s source files into a CorDapp jars
-- Create a new node in `build/nodes` with our CorDapp already installed
+- Create a new node in `./build/nodes` with our CorDapp already installed
 
 We can do that now by running the following commands from the root of the project:
 
     ./gradlew clean deployNodes
 
-Running `deployNodes` will build the nodes under `build/nodes`. If we navigate to one of these folders, 
+Running `deployNodes` will build the nodes under `./build/nodes`. If we navigate to one of these folders, 
 we’ll see the three node folders. Each node folder has the following structure:
 
     .
@@ -32,6 +35,8 @@ we’ll see the three node folders. Each node folder has the following structure
 Let’s start the nodes by running the following commands from the root of the project:  
 
     build/nodes/runnodes
+
+or use `./run-all.bat` script
 
 ## Interacting with the nodes
 
@@ -70,8 +75,10 @@ the other nodes on the network:
 
 Check available flows by `flow list` command:
 
-    Wed Dec 04 17:47:34 MSK 2019>>> flow list
+    Mon Dec 16 16:35:32 MSK 2019>>> flow list
     com.template.flows.iou.IOUFlow$Initiator
+    com.template.flows.xogame.MakeStepFlow$Initiator
+    com.template.flows.xogame.StartGameFlow$Initiator
     net.corda.core.flows.ContractUpgradeFlow$Authorise
     net.corda.core.flows.ContractUpgradeFlow$Deauthorise
     net.corda.core.flows.ContractUpgradeFlow$Initiate
@@ -94,7 +101,29 @@ Inspect status of transaction by `run vaultQuery` command:
  
     run vaultQuery contractStateType: com.template.states.IOUState
 
-Only `NodeA` & `NodeB` know about this transation. You could check it by running same command on notary node
+Only `NodeA` & `NodeB` know about this transaction. You could check it by running same command on notary node
+
+Create XO game by `PartyA` node:
+
+    start StartGameFlow$Initiator gameId: "Game-01", opponent: "PartyB"
+
+Inspect status of transaction (by `PartyA` or `PartyB`):
+
+    run vaultQuery contractStateType: com.template.states.XoGameState
+
+Make first step by `PartyA`:
+
+    start MakeStepFlow$Initiator gameId: "Game-01", opponent: "PartyB", newField: "----X----"
+
+Make second step by `PartyB`:
+
+    start MakeStepFlow$Initiator gameId: "Game-01", opponent: "PartyA", newField: "----XO---"
+
+And next from `PartyA` again:
+
+    start MakeStepFlow$Initiator gameId: "Game-01", opponent: "PartyB", newField: "----XOX--"
+
+etc.
 
 You can find out more about the node shell [here](https://docs.corda.net/shell.html).
 
