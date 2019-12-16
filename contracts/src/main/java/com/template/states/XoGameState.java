@@ -26,14 +26,15 @@ public class XoGameState implements LinearState, QueryableState {
     private final String gameId;
     private final Party player1;
     private final Party player2;
+    private final Party nextTurnOwner;
     private final XoGameField gameField;
 
     public XoGameState(String gameId, Party player1, Party player2) {
-        this.linearId = new UniqueIdentifier(gameId);
-        this.gameId = gameId;
-        this.player1 = player1;
-        this.player2 = player2;
-        this.gameField = new XoGameField();
+        this(gameId, player1, player2, player1, new XoGameField());
+    }
+
+    public XoGameState(String gameId, Party player1, Party player2, Party nextTurnOwner) {
+        this(gameId, player1, player2, nextTurnOwner, new XoGameField());
     }
 
     /**
@@ -41,11 +42,12 @@ public class XoGameState implements LinearState, QueryableState {
      * be used to indicate which one. See https://docs.corda.net/serialization.html for details
      */
     @ConstructorForDeserialization
-    public XoGameState(String gameId, Party player1, Party player2, XoGameField gameField) {
+    public XoGameState(String gameId, Party player1, Party player2, Party nextTurnOwner, XoGameField gameField) {
         this.linearId = new UniqueIdentifier(gameId);
         this.gameId = gameId;
         this.player1 = player1;
         this.player2 = player2;
+        this.nextTurnOwner = nextTurnOwner;
         this.gameField = gameField;
     }
 
@@ -65,6 +67,10 @@ public class XoGameState implements LinearState, QueryableState {
 
     public Party getPlayer2() {
         return player2;
+    }
+
+    public Party getNextTurnOwner() {
+        return nextTurnOwner;
     }
 
     public XoGameField getGameField() {
@@ -87,6 +93,7 @@ public class XoGameState implements LinearState, QueryableState {
             .append(gameId, that.gameId)
             .append(player1, that.player1)
             .append(player2, that.player2)
+            .append(nextTurnOwner, that.nextTurnOwner)
             .append(gameField, that.gameField)
             .isEquals();
     }
@@ -97,6 +104,7 @@ public class XoGameState implements LinearState, QueryableState {
             .append(gameId)
             .append(player1)
             .append(player2)
+            .append(nextTurnOwner)
             .append(gameField)
             .toHashCode();
     }
@@ -116,7 +124,8 @@ public class XoGameState implements LinearState, QueryableState {
                 this.gameId,
                 this.player1.getName().toString(),
                 this.player2.getName().toString(),
-                this.gameField.toLinearString());
+                this.nextTurnOwner.getName().toString(),
+                this.gameField.toString());
         } else {
             throw new IllegalArgumentException("Unrecognised schema $schema");
         }
@@ -126,5 +135,16 @@ public class XoGameState implements LinearState, QueryableState {
     @Override
     public Iterable<MappedSchema> supportedSchemas() {
         return ImmutableList.of(new XoGameSchemaV1());
+    }
+
+    @Override
+    public String toString() {
+        return "XoGameState{" +
+            "gameId='" + gameId + '\'' +
+            ", player1=" + player1 +
+            ", player2=" + player2 +
+            ", nextTurnOwner=" + nextTurnOwner +
+            ", gameField=" + gameField +
+            '}';
     }
 }
