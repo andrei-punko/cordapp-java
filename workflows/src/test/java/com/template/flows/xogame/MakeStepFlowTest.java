@@ -56,4 +56,6 @@ public class MakeStepFlowTest extends AbstractFlowTest {
         assertThat("Keys of NodeA and NodeB should be present in signers list",
             command.getSigners().containsAll(Arrays.asList(aParty.getOwningKey(), bParty.getOwningKey())), is(true));
     }
+
+    // TODO: add other tests
 }

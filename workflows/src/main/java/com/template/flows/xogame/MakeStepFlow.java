@@ -83,9 +83,9 @@ public class MakeStepFlow {
             Vault.Page<XoGameState> results = getServiceHub().getVaultService().queryBy(XoGameState.class, queryCriteria);
             List<StateAndRef<XoGameState>> states = results.getStates();
             if (states.isEmpty()) {
-                throw new IllegalArgumentException("Required state not found");
+                throw new FlowException("Required state not found");
             } else if (states.size() > 1) {
-                throw new IllegalArgumentException("There are more than one required state");
+                throw new FlowException("There are more than one required state");
             }
 
             StateAndRef<XoGameState> inputStateAndRef = states.get(0);
@@ -93,7 +93,7 @@ public class MakeStepFlow {
             getLogger().info(inputState.toString());
 
             if (!inputState.getNextTurnOwner().equals(me)) {
-                throw new IllegalArgumentException("It's not this node turn");
+                throw new FlowException("It's not this node turn");
             }
 
             Set<Party> players = new HashSet<>();
@@ -101,7 +101,7 @@ public class MakeStepFlow {
             players.add(inputState.getPlayer2());
             players.remove(me);
             if (!players.contains(opponent)) {
-                throw new IllegalArgumentException("Wrong opponent");
+                throw new FlowException("Wrong opponent");
             }
 
             XoGameState outputState = new XoGameState(gameId,
