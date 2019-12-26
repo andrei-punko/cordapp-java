@@ -32,7 +32,7 @@ public abstract class AbstractFlowTest {
 
     @Before
     public void setup() {
-        mockNetwork.runNetwork();
+        mockNetwork.runNetwork(-1);
     }
 
     @After
