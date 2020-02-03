@@ -1,18 +1,14 @@
 package com.template.webserver;
 
-import com.google.common.collect.ImmutableMap;
 import com.template.flows.iou.IOUFlow;
 import com.template.states.IOUState;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import net.corda.core.contracts.StateAndRef;
 import net.corda.core.identity.CordaX500Name;
 import net.corda.core.identity.Party;
 import net.corda.core.messaging.CordaRPCOps;
-import net.corda.core.node.NodeInfo;
 import net.corda.core.transactions.SignedTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,46 +24,22 @@ import org.springframework.web.bind.annotation.RestController;
  * Define your API endpoints here. Current set of actions taken from https://docs.corda.net/tutorial-cordapp.html
  */
 @RestController
-@RequestMapping("/api/example/") // The paths for GET and POST requests are relative to this base path.
-public class Controller {
+@RequestMapping("/iou")
+public class IouController {
 
     private final CordaRPCOps proxy;
     private final CordaX500Name myLegalName;
-    private final static Logger logger = LoggerFactory.getLogger(Controller.class);
-    private final List<String> SERVICE_NAMES = Arrays.asList("Notary", "Network Map Service");
+    private final static Logger logger = LoggerFactory.getLogger(IouController.class);
 
-    public Controller(NodeRPCConnection rpc) {
+    public IouController(NodeRPCConnection rpc) {
         this.proxy = rpc.proxy;
         this.myLegalName = rpc.proxy.nodeInfo().getLegalIdentities().get(0).getName();
     }
 
     /**
-     * Returns the node's name.
-     */
-    @GetMapping(value = "me", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, CordaX500Name> getNodeName() {
-        return ImmutableMap.of("me", myLegalName);
-    }
-
-    /**
-     * Returns all parties registered with the network map service. These names can be used to look up identities using
-     * the identity service.
-     */
-    @GetMapping(value = "peers", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, List<CordaX500Name>> getPeers() {
-        List<NodeInfo> nodesInfo = proxy.networkMapSnapshot();
-        return ImmutableMap.of("peers", nodesInfo.stream().map(nodeInfo -> {
-            return nodeInfo.getLegalIdentities().get(0).getName();
-        }).filter(o -> {
-            return !SERVICE_NAMES.contains(o.getOrganisation()) &&
-                !myLegalName.getOrganisation().equals(o.getOrganisation());
-        }).collect(Collectors.toList()));
-    }
-
-    /**
      * Displays all IOU states that exist in the node's vault.
      */
-    @GetMapping(value = "ious", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<StateAndRef<IOUState>>> getIOUs() {
         return ResponseEntity.ok(proxy.vaultQuery(IOUState.class).getStates());
     }
@@ -83,8 +55,7 @@ public class Controller {
      * <p>
      * The flow is invoked asynchronously. It returns a future when the flow's call() method returns.
      */
-
-    @PostMapping(value = "create-iou", produces = MediaType.TEXT_PLAIN_VALUE, headers = "Content-Type=application/x-www-form-urlencoded")
+    @PostMapping(produces = MediaType.TEXT_PLAIN_VALUE, headers = "Content-Type=application/x-www-form-urlencoded")
     public ResponseEntity<String> createIOU(HttpServletRequest request) {
         Integer iouValue = Integer.valueOf(request.getParameter("iouValue"));
         String partyName = request.getParameter("partyName");
@@ -116,7 +87,7 @@ public class Controller {
     /**
      * Displays all IOU states that only this node has been involved in.
      */
-    @GetMapping(value = "my-ious", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "my", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<StateAndRef<IOUState>>> getMyIOUs() {
         List<StateAndRef<IOUState>> myIous = proxy.vaultQuery(IOUState.class).getStates().stream()
             .filter(it -> {
