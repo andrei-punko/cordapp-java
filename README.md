@@ -171,20 +171,43 @@ To start webserver use `runPartyAServer` or `runPartyBServer` tasks
 List of available actions taken from [here](https://docs.corda.net/tutorial-cordapp.html):
 
 - Returns the node's name:  
-`http://localhost:10050/api/example/me`
+
+      curl http://localhost:10050/node/me
 
 - Returns all parties registered with the network map service:  
-`http://localhost:10050/api/example/peers`
+
+      curl http://localhost:10050/node/peers
 
 - Displays all IOU states that exist in the node's vault:  
-`http://localhost:10050/api/example/ious`
+
+      curl http://localhost:10050/iou
 
 - To create an IOU between PartyA and PartyB, run the following command from the command line:  
-`curl -i -X POST 'http://localhost:10050/api/example/create-iou?iouValue=8&partyName=O=PartyB,+L=New+York,+C=US' -H 'Content-Type: application/x-www-form-urlencoded'`
+
+      curl -i -X POST 'http://localhost:10050/iou?iouValue=8&partyName=O=PartyB,+L=New+York,+C=US' -H 'Content-Type: application/x-www-form-urlencoded'
 
 - Check IOU states again to see added transaction:  
-`http://localhost:10050/api/example/ious`
-    
+
+      curl http://localhost:10050/iou
+
+- Get all games known by this node:
+
+      curl http://localhost:10050/xo
+
+- Get game by id:
+
+      curl http://localhost:10050/xo/<GAME_ID>
+
+- Start new game:
+
+      curl -i -X POST 'http://localhost:10050/xo?gameId=MySuperGame&opponent=O=PartyB,+L=New+York,+C=US' -H 'Content-Type: application/x-www-form-urlencoded'
+
+- Make some steps by each participant:
+
+      curl -i -X PUT 'http://localhost:10050/xo?gameId=MySuperGame&opponent=O=PartyB,+L=New+York,+C=US&newField=----X----' -H 'Content-Type: application/x-www-form-urlencoded'
+      curl -i -X PUT 'http://localhost:10051/xo?gameId=MySuperGame&opponent=O=PartyA,+L=London,+C=GB&newField=----X---O' -H 'Content-Type: application/x-www-form-urlencoded'
+      ...
+
 ## Extending the application
 You could extend this application as follows:
 
