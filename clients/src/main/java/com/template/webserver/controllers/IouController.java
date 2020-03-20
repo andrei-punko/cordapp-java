@@ -1,7 +1,8 @@
-package com.template.webserver;
+package com.template.webserver.controllers;
 
 import com.template.flows.iou.IOUFlow;
 import com.template.states.IOUState;
+import com.template.webserver.NodeRPCConnection;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -32,8 +33,8 @@ public class IouController {
     private final static Logger logger = LoggerFactory.getLogger(IouController.class);
 
     public IouController(NodeRPCConnection rpc) {
-        this.proxy = rpc.proxy;
-        this.myLegalName = rpc.proxy.nodeInfo().getLegalIdentities().get(0).getName();
+        this.proxy = rpc.getProxy();
+        this.myLegalName = proxy.nodeInfo().getLegalIdentities().get(0).getName();
     }
 
     /**

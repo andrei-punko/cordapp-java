@@ -11,7 +11,7 @@
     <module name="cordapp-iou-java.clients.main" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="com.template.webserver.*" />
+        <option name="PATTERN" value="com.template.webserver.controllers.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>

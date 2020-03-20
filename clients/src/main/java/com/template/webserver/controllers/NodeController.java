@@ -1,6 +1,7 @@
-package com.template.webserver;
+package com.template.webserver.controllers;
 
 import com.google.common.collect.ImmutableMap;
+import com.template.webserver.NodeRPCConnection;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +26,8 @@ public class NodeController {
     private final List<String> SERVICE_NAMES = Arrays.asList("Notary", "Network Map Service");
 
     public NodeController(NodeRPCConnection rpc) {
-        this.proxy = rpc.proxy;
-        this.myLegalName = rpc.proxy.nodeInfo().getLegalIdentities().get(0).getName();
+        this.proxy = rpc.getProxy();
+        this.myLegalName = proxy.nodeInfo().getLegalIdentities().get(0).getName();
     }
 
     /**

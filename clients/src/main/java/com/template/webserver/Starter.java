@@ -21,7 +21,7 @@ public class Starter {
      */
     @Bean
     public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter(@Autowired NodeRPCConnection rpcConnection)  {
-        ObjectMapper mapper = JacksonSupport.createDefaultMapper(rpcConnection.proxy);
+        ObjectMapper mapper = JacksonSupport.createDefaultMapper(rpcConnection.getProxy());
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         converter.setObjectMapper(mapper);
         return converter;

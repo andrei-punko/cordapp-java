@@ -31,7 +31,7 @@ public class NodeRPCConnection implements AutoCloseable {
     private int rpcPort;
 
     private CordaRPCConnection rpcConnection;
-    CordaRPCOps proxy;
+    private CordaRPCOps proxy;
 
     @PostConstruct
     public void initialiseNodeRPCConnection() {
@@ -44,5 +44,9 @@ public class NodeRPCConnection implements AutoCloseable {
     @PreDestroy
     public void close() {
         rpcConnection.notifyServerAndClose();
+    }
+
+    public CordaRPCOps getProxy() {
+        return proxy;
     }
 }
