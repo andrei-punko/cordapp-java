@@ -168,6 +168,11 @@ with the username `user1` and the password `test`, and serves the webserver on p
 #### Interacting with the webserver
 To start webserver use `runPartyAServer` or `runPartyBServer` tasks
 
+- Swagger documentation available here:
+
+      http://localhost:10050/swagger-ui.html
+      http://localhost:10051/swagger-ui.html
+
 List of available actions taken from [here](https://docs.corda.net/tutorial-cordapp.html):
 
 - Returns the node's name:  
