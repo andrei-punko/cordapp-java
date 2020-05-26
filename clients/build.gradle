@@ -1,5 +1,6 @@
 import org.gradle.api.tasks.JavaExec
 
+apply plugin: 'io.spring.dependency-management'
 apply plugin: 'org.springframework.boot'
 
 sourceSets {
@@ -7,6 +8,12 @@ sourceSets {
         resources {
             srcDir rootProject.file("config/dev")
         }
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
     }
 }
 
@@ -19,7 +26,7 @@ dependencies {
     compile project(":contracts")
     compile project(":workflows")
 
-    compile("org.springframework.boot:spring-boot-starter-websocket:$spring_boot_version") {
+    compile("org.springframework.boot:spring-boot-starter-websocket") {
         exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
     }
 
