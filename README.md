@@ -12,7 +12,7 @@ The Kotlin template situated [here](https://github.com/corda/cordapp-template-ko
 ###### CorDapp (Corda Distributed Application) - distributed applications that run on the Corda platform
 
 ## Pre-Requisites
-See https://docs.corda.net/getting-set-up.html.
+JDK 8. See https://docs.corda.net/getting-set-up.html.
 
 ## Deploying our CorDapp and running the nodes
 See https://docs.corda.net/tutorial-cordapp.html#running-the-example-cordapp for details.
