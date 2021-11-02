@@ -1,6 +1,8 @@
 
 # Example of Corda platform usage
 ![Java CI with Gradle](https://github.com/andrei-punko/cordapp-java/workflows/Java%20CI%20with%20Gradle/badge.svg)
+[![Coverage](.github/badges/jacoco.svg)](https://github.com/andrei-punko/cordapp-java/actions/workflows/gradle.yml)
+[![Branches](.github/badges/branches.svg)](https://github.com/andrei-punko/cordapp-java/actions/workflows/gradle.yml)
 
 Contains two applications:
 - "I owe you" (IoU) blockchain-based application
