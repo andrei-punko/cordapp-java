@@ -2,6 +2,7 @@ import org.gradle.api.tasks.JavaExec
 
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'jacoco'
 
 sourceSets {
     main {
@@ -58,4 +59,19 @@ task runPartyBServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.template.webserver.Starter'
     args '--server.port=10051', '--config.rpc.host=localhost', '--config.rpc.port=10009', '--config.rpc.username=user1', '--config.rpc.password=test'
+}
+
+test {
+    finalizedBy jacocoTestReport // report is always generated after tests run
+}
+jacocoTestReport {
+    reports {
+        csv.enabled true
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+            ])
+        }))
+    }
 }
