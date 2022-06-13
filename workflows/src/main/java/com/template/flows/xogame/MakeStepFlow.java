@@ -37,6 +37,7 @@ import net.corda.core.node.services.vault.QueryCriteria;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
+import org.jetbrains.annotations.NotNull;
 
 public class MakeStepFlow {
 
@@ -162,21 +163,16 @@ public class MakeStepFlow {
         public SignedTransaction call() throws FlowException {
 
             class SignTxFlow extends SignTransactionFlow {
-
                 private SignTxFlow(FlowSession otherPartySession, ProgressTracker progressTracker) {
                     super(otherPartySession, progressTracker);
                 }
 
                 @Override
-                protected void checkTransaction(SignedTransaction stx) {
-                    requireThat(require -> {
-                        ContractState output = stx.getTx().getOutputs().get(0).getData();
-                        require.using("This must be an XoGameState transaction.", output instanceof XoGameState);
-                        XoGameState xoGameState = (XoGameState) output;
-                        // TODO: add required checks
-
-                        return null;
-                    });
+                protected void checkTransaction(@NotNull SignedTransaction stx) throws FlowException {
+                    ContractState outputState = stx.getTx().getOutputs().get(0).getData();
+                    if (!(outputState instanceof XoGameState)) {
+                        throw new FlowException("Wrong output state type");
+                    }
                 }
             }
 
